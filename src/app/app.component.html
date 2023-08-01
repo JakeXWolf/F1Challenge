@@ -11,7 +11,6 @@
       </g>
     </g>
   </svg>
-
   <span>Generate Constructor Order!</span>
 
   <svg id="rocket-smoke" xmlns="http://www.w3.org/2000/svg" width="516.119" height="1083.632" viewBox="0 0 516.119 1083.632">
@@ -22,26 +21,92 @@
 </div>
 
 
-<button mat-raised-button color="accent" (click)="onDriverSelection()">Generate Next Selection</button>
+  <h3>PreRace: Enter Constructor Team JSON that contains Names and TotalPoints. Update Drivers Championship</h3>
+  <h3>PostRace: Enter Constructor Team JSON that contains Names, TotalPoints, and Drivers. Then Enter string for race results and Calculate</h3>
 
+
+<!-- <button mat-raised-button color="accent" (click)="onDriverSelection()"></button> -->
+<p-button label="Generate Next Selection" styleClass="p-button-raised p-button-text" (click)="onDriverSelection()"></p-button>
 
 <h2>Constructor Draft</h2>
 
-<div class="card-container" style="display: block;">
-  <div *ngFor="let item of constructorDisplay">
-    <h3>
-      {{item}}
-    </h3>
-  </div>
+<p-table [value]="constructorDisplay" [tableStyle]="{ 'min-width': '35rem' }">
+  <ng-template pTemplate="header">
+    <tr>
+      <th style="width: 4rem;">Order</th>
+      <th>Name</th>
+      <th style="width: 4rem;">Standing</th>
+      <th>Driver</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-item>
+    <tr *ngIf="item.Position === 0; else elseBlock">
+      <td>{{ item.AssignedOrder }}</td>
+      <td>{{ item.Name }}</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <ng-template  #elseBlock>
+      <tr>
+        <td>{{ item.AssignedOrder }}</td>
+        <td>{{ item.Name }}</td>
+        <td>{{ item.Position }}</td>
+        <td>{{ item.Driver }}</td>
+      </tr>
+    </ng-template>
+  </ng-template>
+</p-table>
+
+<div>
+  <h2 style="color: red;">Constructors Championship</h2>
+  
+  <p-table [value]="overallConstructorChamps" >
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4rem;">Points</th>
+        <th>Constructor</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-item>
+      <tr>
+        <td>{{ item.TotalPoints }}</td>
+        <td>{{ item.Name }}</td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="summary" [display]="this.overallConstructorChamps.length > 0">
+      <div class="flex align-items-center justify-content-between">
+        <textarea rows="5" cols="30" pInputTextarea [(ngModel)]="overallConstructorChampsJson"></textarea>
+      </div>
+    </ng-template>
+  </p-table>
 </div>
 
+<textarea rows="5" cols="30" pInputTextarea [(ngModel)]="raceResultsInput"></textarea>
+<p-button label="Calculate Constructors Champ" styleClass="p-button-raised p-button-text" (click)="onCalculateConstructors()"></p-button>
 
 <h2 style="color: blue;">Drivers Championship</h2>
 
-<div class="card-container" style="display: block;">
-  <div *ngFor="let item of f1DriversChampionship">
-    <h3 style="color: blue;">
-      {{item.position}}. {{item.driver}}
-    </h3>
-  </div>
-</div>
+<p-table [value]="f1DriversChampionship" >
+  <ng-template pTemplate="header">
+    <tr>
+      <th style="width: 4rem;">Place</th>
+      <th>Driver Name</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-item>
+    <tr>
+      <td>{{ item.position }}</td>
+      <td>{{ item.driver }}</td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="summary">
+    <div class="flex align-items-center justify-content-between">
+      <textarea rows="5" cols="30" pInputTextarea [(ngModel)]="driversChampJson"></textarea>
+      <p-button label="Set Drivers Champ" styleClass="p-button-raised p-button-text" (click)="onSetDriversChampJson()"></p-button>
+    </div>
+  </ng-template>
+</p-table>
+
+<p-button label="Get Constructor JSON" styleClass="p-button-raised p-button-text" (click)="onGetcurrentGrandPrixTeamsJson()"></p-button>
+<textarea rows="5" cols="30" pInputTextarea [(ngModel)]="currentGrandPrixTeamsJson"></textarea>
+<p-button label="Set Constructor JSON" styleClass="p-button-raised p-button-text" (click)="onSetcurrentGrandPrixTeamsJson()"></p-button>
