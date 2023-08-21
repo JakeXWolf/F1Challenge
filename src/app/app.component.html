@@ -1,4 +1,295 @@
+
+<div id="ex">
+</div>
+
+<!-- Opening Page -->
+<div *ngIf="isOpeningPage" style="text-align: center;">
+
+  <h1 class="openingHeader">Welcome to the F1 Challenge!</h1>
+
+  <div style="margin: 5%;"></div>
+  <p-button styleClass="p-button-raised p-button-secondary" (click)="onPreRaceWeekend()">
+    <h2>Before Race Weekend</h2>
+  </p-button>
+  <div style="margin: 5%;"></div>
+  <p-button styleClass="p-button-raised p-button-secondary" (click)="onPostRaceWeekend()">
+    <h2>After Race Weekend</h2>
+  </p-button>
+
+</div>
+
+
+
+<!-------------- Pre Race Set Up -------------->
+
+<div *ngIf="isPreRaceWeekend">
+  <h1 class="openingHeader">Verify The Drivers Championship Order</h1>
+  <h4 class="linkClass">
+    <a href="https://www.formula1.com/en/results.html/2023/drivers.html" target="_blank">F1 Drivers Championship Link</a>
+  </h4>
+
+  <div class="gridContainer">
+    <p-table
+      [value]="f1DriversChampionship"
+      styleClass="p-datatable-gridlines"
+      [tableStyle]="{ 'min-width': '30rem' }"
+    >
+    <!-- <p-table [value]="f1DriversChampionship"> -->
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 4rem;">Place</th>
+          <th>Driver Name</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.position }}</td>
+          <td>{{ item.driver }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="summary">
+        <div class="flex align-items-center justify-content-between" style="display: inline-grid;">
+          <textarea rows="5" cols="30" pInputTextarea [(ngModel)]="driversChampJson"></textarea>
+          <p-button label="Set Drivers Champ" styleClass="p-button-raised p-button-text" (click)="onSetDriversChampJson()"></p-button>
+        </div>
+      </ng-template>
+    </p-table>
+  </div>
+  <div class="directonButtonsCtn">
+    <p-button styleClass="p-button-raised p-button-danger" (click)="onDriversChampGoBack();">
+      <span class="p-button-label">
+        An Inchident!<br/>
+        Box to Home.
+      </span>
+    </p-button>
+    <div style="margin: 3%;"></div>
+    <p-button styleClass="p-button-raised p-button-secondary" (click)="onDriversChampApproved()">
+      <span class="p-button-label">
+        Simply Lovely!<br/>
+        Continue.
+      </span>
+    </p-button>
+  </div>
+</div>
+
+<div *ngIf="isPreRaceConstructSetup">
+  <h1 class="openingHeader">Constructors Championship</h1>
+  <div style="margin: 3%;"></div>
+
+  <div class="gridContainer">
+    <p-table
+      [value]="constructorTeams"
+      styleClass="p-datatable-gridlines"
+      [tableStyle]="{ 'min-width': '30rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 4rem;">Points</th>
+          <th>Constructor</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.TotalPoints }}</td>
+          <td>{{ item.Name }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="summary">
+        <div class="flex align-items-center justify-content-between" style="display: inline-grid;">
+          <textarea rows="5" cols="30" pInputTextarea [(ngModel)]="constructorTeamsJson"></textarea>
+          <p-button label="Set Constructor JSON" styleClass="p-button-raised p-button-text" (click)="onSetConstructorTeamsJson()"></p-button>
+        </div>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <div class="directonButtonsCtn">
+    <p-button styleClass="p-button-raised p-button-danger" (click)="onConstructChampGoBack();">
+      <span class="p-button-label">
+        An Inchident!<br/>
+        Go Back.
+      </span>
+    </p-button>
+    <div style="margin: 3%;"></div>
+    <p-button styleClass="p-button-raised p-button-secondary" (click)="onConstructChampApproved()">
+      <span class="p-button-label">
+        Simply Lovely!<br/>
+        Continue.
+      </span>
+    </p-button>
+  </div>
+
+</div>
+
+<div *ngIf="isPreRaceConstructGeneration">
+  <h1 class="openingHeader">Constructors Draft</h1>
+
+  <div class="constructorDraftButtons">
+    <p-button label="Randomize Construct Order" styleClass="p-button-raised p-button-secondary" (click)="onGenerateConstructorOrder()"></p-button>
+    <p-button label="Generate Next Selection" styleClass="p-button-raised p-button-secondary" (click)="onDriverSelection()"></p-button>
+    <p-button label="Generate All" styleClass="p-button-raised p-button-secondary" (click)="onDriverSelectionForAll()"></p-button>
+  </div>
+
+  <div class="gridContainer">
+    <p-table 
+      [value]="constructorDisplay" 
+      styleClass="p-datatable-gridlines"
+      [tableStyle]="{ 'min-width': '30rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 4rem;">Order</th>
+          <th>Name</th>
+          <th style="width: 4rem;">Standing</th>
+          <th>Driver</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr *ngIf="item.Position === 0; else elseBlock">
+          <td>{{ item.AssignedOrder }}</td>
+          <td>{{ item.Name }}</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <ng-template  #elseBlock>
+          <tr>
+            <td>{{ item.AssignedOrder }}</td>
+            <td>{{ item.Name }}</td>
+            <td>{{ item.Position }}</td>
+            <td>{{ item.Driver }}</td>
+          </tr>
+        </ng-template>
+      </ng-template>
+      <ng-template pTemplate="summary">
+        <div class="flex align-items-center justify-content-between">
+          <textarea rows="5" cols="30" pInputTextarea [(ngModel)]="constructorTeamsJson"></textarea>
+        </div>
+      </ng-template>
+    </p-table>
+  </div>
+  
+  <div class="directonButtonsCtn">
+    <p-button styleClass="p-button-raised p-button-danger" (click)="onConstructDraftGoBack();">
+      <span class="p-button-label">
+        Red Flag!<br/>
+        Pit to Constructors Title.
+      </span>
+    </p-button>
+  </div>
+</div>
+
+<!-------------- Post Race Set Up ----------------->
+
+<div *ngIf="isPostRaceWeekend">
+  <h1 class="openingHeader">Constructors Championship</h1>
+  <div style="margin: 3%;"></div>
+
+  <div class="gridContainer">
+    <p-table 
+      [value]="constructorTeams" 
+      styleClass="p-datatable-gridlines"
+      [tableStyle]="{ 'min-width': '40rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 4rem;">Points</th>
+          <th>Constructor</th>
+          <th *ngIf="isDriversEntered">Drivers</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.TotalPoints }}</td>
+          <td>{{ item.Name }}</td>
+          <!-- <td></td> -->
+          <td *ngIf="isDriversEntered">{{ item.Drivers[0] }} & {{ item.Drivers[1] }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="summary">
+        <div class="flex align-items-center justify-content-between" style="display: inline-grid;">
+          <textarea rows="5" cols="30" pInputTextarea [(ngModel)]="constructorTeamsJson"></textarea>
+          <p-button label="Set Constructor JSON" styleClass="p-button-raised p-button-text" (click)="onPostRaceSetConstructorTeamsJson()"></p-button>
+        </div>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <div class="directonButtonsCtn">
+    <p-button styleClass="p-button-raised p-button-danger" (click)="onPostRaceConstructorGoBack();">
+      <span class="p-button-label">
+        An Inchident!<br/>
+        Go Back.
+      </span>
+    </p-button>
+    <div style="margin: 3%;"></div>
+    <p-button styleClass="p-button-raised p-button-secondary" (click)="onPostRaceConstructorComplete()">
+      <span class="p-button-label">
+        Simply Lovely!<br/>
+        Continue.
+      </span>
+    </p-button>
+  </div>
+</div>
+
+<div *ngIf="isPostRaceEnterResults">
+  <h1 class="openingHeader">Constructors Championship</h1>
+  <div style="margin: 3%;"></div>
+
+  <div class="gridContainer" *ngIf="isPostRaceResultsEntered">
+    <p-table 
+      [value]="constructorTeams" 
+      styleClass="p-datatable-gridlines"
+      [tableStyle]="{ 'min-width': '40rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 4rem;">Points</th>
+          <th>Constructor</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr>
+          <td>{{ item.TotalPoints }}</td>
+          <td>{{ item.Name }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="summary">
+        <textarea rows="5" cols="30" pInputTextarea [(ngModel)]="constructorTeamsJson"></textarea>
+      </ng-template>
+    </p-table>
+    <div style="margin: 3%;"></div>
+  </div>
+
+  <div class="linkClass">
+    <h3>
+      Enter Race Results
+    </h3>
+    <!-- FEATURE IDEA: HAVE LINK SET BASED ON DATE -->
+    <h4>
+      <a href="https://www.formula1.com/en/results.html/2023/races/1216/belgium/race-result.html" target="_blank">F1 Race Results Link</a>
+    </h4>
+  </div>
+  <div class="gridContainer">
+    <div id="raceResultsCtn" class="flex align-items-center justify-content-between">
+      <textarea rows="5" cols="30" pInputTextarea [(ngModel)]="raceResultsInput"></textarea>
+      <p-button label="Submit Race Results" styleClass="p-button-raised p-button-secondary" (click)="onCalculateConstructors()"></p-button>
+    </div>
+  </div>
+
+  <div class="directonButtonsCtn">
+    <p-button styleClass="p-button-raised p-button-danger" (click)="onPostRaceEnterResultsGoBack();">
+      <span class="p-button-label">
+        An Inchident!<br/>
+        Go Back.
+      </span>
+    </p-button>
+  </div>
+</div>
+
+
+
 <!-- Highlight Card -->
+<!--
 <div class="card highlight-card card-small" (click)="onGenerateConstructorOrder()">
 
   <svg id="rocket" xmlns="http://www.w3.org/2000/svg" width="101.678" height="101.678" viewBox="0 0 101.678 101.678">
@@ -25,7 +316,6 @@
   <h3>PostRace: Enter Constructor Team JSON that contains Names, TotalPoints, and Drivers. Then Enter string for race results and Calculate</h3>
 
 
-<!-- <button mat-raised-button color="accent" (click)="onDriverSelection()"></button> -->
 <p-button label="Generate Next Selection" styleClass="p-button-raised p-button-text" (click)="onDriverSelection()"></p-button>
 
 <h2>Constructor Draft</h2>
@@ -59,7 +349,7 @@
 
 <div>
   <h2 style="color: red;">Constructors Championship</h2>
-  
+
   <p-table [value]="overallConstructorChamps" >
     <ng-template pTemplate="header">
       <tr>
@@ -107,6 +397,7 @@
   </ng-template>
 </p-table>
 
-<p-button label="Get Constructor JSON" styleClass="p-button-raised p-button-text" (click)="onGetcurrentGrandPrixTeamsJson()"></p-button>
-<textarea rows="5" cols="30" pInputTextarea [(ngModel)]="currentGrandPrixTeamsJson"></textarea>
-<p-button label="Set Constructor JSON" styleClass="p-button-raised p-button-text" (click)="onSetcurrentGrandPrixTeamsJson()"></p-button>
+<p-button label="Get Constructor JSON" styleClass="p-button-raised p-button-text" (click)="onGetconstructorTeamsJson()"></p-button>
+<textarea rows="5" cols="30" pInputTextarea [(ngModel)]="constructorTeamsJson"></textarea>
+<p-button label="Set Constructor JSON" styleClass="p-button-raised p-button-text" (click)="onSetconstructorTeamsJson()"></p-button>
+-->

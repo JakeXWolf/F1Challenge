@@ -1,3 +1,16 @@
+/* html
+{
+ margin:0px;
+ height:100%;
+ width:100%;
+ background:url('../assets/flag-background.jpg')no-repeat center center fixed; 
+ -webkit-background-size:cover;
+ -o-background-size:cover;
+ -moz-background-size:cover;
+ background-size:cover;
+} */
+
+
 :host {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     font-size: 18px;
@@ -6,6 +19,110 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+
+#ex {
+  text-align: center;
+  background-image: url('../assets/flag-background.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  z-index: -1;
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+  position: fixed;
+}
+
+.openingHeader {
+  text-align: center;
+  padding: 2% 0 2% 0;
+  background: #e10600;
+  color: white;
+  position: relative;
+  margin: 0px;
+}
+
+.linkClass {
+  text-align: center;
+  padding: 1% 0 1% 0;
+  background: white;
+  color: #e10600;
+  position: relative;
+  margin: 0 0 2% 0;
+
+}
+/* 
+:host ::ng-deep p-table {
+  text-align: center; 
+} */
+
+/* :host ::ng-deep .gridContainer .p-table {
+  display: -webkit-box;
+  width: fit-content;
+  text-align: center;
+  width: 30rem;
+} */
+
+.gridContainer {
+  text-align: -webkit-center;
+}
+
+:host ::ng-deep .gridContainer .p-datatable .p-datatable-thead > tr > th {
+  text-align: center;
+}
+
+:host ::ng-deep .gridContainer .p-datatable .p-datatable-tbody > tr > td {
+  text-align: center;
+}
+
+:host ::ng-deep .gridContainer .p-component {
+  width: fit-content;
+  text-align: center;
+}
+
+:host ::ng-deep .gridContainer .p-datatable-footer .textarea {
+  text-align: left;
+  margin: 1% 0 1% 0;
+}
+
+:host ::ng-deep .gridContainer .p-datatable-footer .p-button.p-element {
+  margin-top: 5%;
+}
+
+
+.directonButtonsCtn {
+  display: flex;
+  text-align: center;
+  margin: 2% 0 2% 0;
+  justify-content: center;
+}
+
+:host ::ng-deep .directonButtonsCtn .p-button {
+  flex: 1;
+}
+
+.constructorDraftButtons {
+  text-align: center;
+  margin: 5%;
+}
+
+:host ::ng-deep .constructorDraftButtons .p-button {
+  margin: 0 2% 0 2%;
+}
+
+#raceResultsCtn {
+  display: inline-grid;
+  z-index: 100;
+  position: relative;
+  width: 75%;
+}
+
+#raceResultsCtn > textarea {
+  width: auto;
+  margin-bottom: 2%;
+}
+
 
   h1,
   h2,

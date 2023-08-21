@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 
 import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
 import { TableModule } from 'primeng/table';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 
@@ -17,6 +18,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
     FormsModule,
 
     ButtonModule,
+    CheckboxModule,
     TableModule,
     InputTextareaModule
   ],
