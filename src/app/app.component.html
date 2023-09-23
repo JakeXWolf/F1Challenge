@@ -43,8 +43,8 @@
       </ng-template>
       <ng-template pTemplate="body" let-item>
         <tr>
-          <td>{{ item.position }}</td>
-          <td>{{ item.driver }}</td>
+          <td>{{ item.POS }}</td>
+          <td>{{ item.DRIVER }}</td>
         </tr>
       </ng-template>
       <ng-template pTemplate="summary">
@@ -202,7 +202,10 @@
           <td>{{ item.TotalPoints }}</td>
           <td>{{ item.Name }}</td>
           <!-- <td></td> -->
-          <td *ngIf="isDriversEntered">{{ item.Drivers[0] }} & {{ item.Drivers[1] }}</td>
+          <td *ngIf="isDriversEntered">
+            <p-dropdown [options]="f1DriversOptions" [(ngModel)]="item.Drivers[0]" optionLabel="DRIVER"></p-dropdown>
+            <p-dropdown [options]="f1DriversOptions" [(ngModel)]="item.Drivers[1]" optionLabel="DRIVER"></p-dropdown>
+          </td>
         </tr>
       </ng-template>
       <ng-template pTemplate="summary">

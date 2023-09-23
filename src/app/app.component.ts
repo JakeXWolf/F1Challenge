@@ -1,47 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 
-class ConstructorChamp {
-  Name: string = '';
-  TotalPoints: number = 0;
-  Drivers: string[] = [];
-  DriverNumbers: number[] = [];
-
-  public constructor(init?: Partial<ConstructorChamp>) {
-    Object.assign(this, init);
-  }
-}
-
-class ConstructorOrder {
-  Name: string = '';
-  AssignedOrder: number = 0;
-  Position: number = 0;
-  Driver: string = '';
-  
-  public constructor(assignedOrder: number) {
-    this.AssignedOrder = assignedOrder;
-  }
-}
-
-interface F1Result {
-  POS: string;
-  NO: number;
-  DRIVER: string;
-  CAR: string;
-  LAPS: number;
-  'TIME/RETIRED': string;
-  PTS: number;
-  [key: string]: string | number;
-}
-
-interface Formula1Driver {
-  POS: number;
-  NO: number;
-  DRIVER: string;
-  NATIONALITY: string;
-  CAR: string;
-  PTS: number;
-  [key: string]: string | number;
-}
+import { ConstructorChamp } from './core/models/constructor-champ';
+import { ConstructorOrder } from './core/models/constructor-order';
+import { F1Result } from './core/models/f1-results';
+import { Formula1Driver } from './core/models/f1-driver';
+import { TestData } from './core/services/test-data';
 
 @Component({
   selector: 'app-root',
@@ -71,19 +34,36 @@ export class AppComponent {
   raceResultsInput: string = '';
   raceResults: F1Result[] = [];
 
+  // can be automated by number of drivers we have
+  topDrivers: number[] = [1, 2, 3, 4, 5, 6, 7];
+  secondDrivers: number[] = [8, 9, 10, 11, 12, 13, 14];
+
+  f1DriversChampionship: Formula1Driver[] = [];
+  f1DriversOptions: Formula1Driver[] = [];
+  driverList: Formula1Driver[] = [];
+
+  constructor(public testData: TestData) {}
+
   ngOnInit() {
     this.createOrderDisplay();
     this.setConstructorTeams();
 
+    this.driverList = this.testData.getDrivers();
+
     //test
     this.raceResultsInput = this.raceResultsStr;
     this.setConstructor();
+    this.setDriversChampJson();
   }
 
   private setConstructorTeams() {
     this.constructorNames.forEach((x) => {
       this.constructorTeams.push(
-        new ConstructorChamp({ Name: x, Drivers: [] })
+        new ConstructorChamp({
+          Name: x,
+          Drivers: [{ NO: 0 } as Formula1Driver, { NO: 0 } as Formula1Driver],
+          DriverNumbers: [],
+        })
       );
     });
   }
@@ -130,7 +110,7 @@ export class AppComponent {
   }
 
   // takes string copied from f1 page and parses into f1DriversChampionship obj
-  // method written by Chat GPT
+  // method inspired by Chat GPT
   onSetDriversChampJson() {
     const input = this.driversChampJson;
     const lines = input.trim().split('\n');
@@ -150,12 +130,11 @@ export class AppComponent {
       return driver;
     });
 
-    let tmp: { position: number; driver: string; number: number }[] = [];
     drivers.forEach((x) => {
-      tmp.push({ position: x.POS, driver: x.DRIVER, number: x.NO });
+      x.NO = this.driverList.find((d) => d.DRIVER === x.DRIVER)?.NO as number;
     });
 
-    this.f1DriversChampionship = tmp;
+    this.f1DriversChampionship = drivers;
   }
 
   // Grand Prix Team Json
@@ -205,27 +184,32 @@ export class AppComponent {
       return;
     }
 
-    let driverList: number[] = this.listIndex < 7 ? this.topDrivers : this.secondDrivers;
+    let driverList: number[] =
+      this.listIndex < 7 ? this.topDrivers : this.secondDrivers;
 
     // takes random index of drivers and gets the drivers name
     const indexSelected = Math.floor(Math.random() * driverList.length);
-    let driverLabel = this.f1DriversChampionship[driverList[indexSelected] - 1];
+    let driver = this.f1DriversChampionship[driverList[indexSelected] - 1];
 
-    this.constructorDisplay[this.listIndex].Position = driverLabel.position;
+    this.constructorDisplay[this.listIndex].Position = driver.POS;
 
     let conIndex = this.constructorTeams.findIndex(
       (x) => x.Name === this.constructorDisplay[this.listIndex].Name
     );
 
-    let driver = driverLabel.driver;
-
-    if (driverLabel.position == 14) {
-      driver = 'Best of the Rest!';
+    if (driver.POS == 14) {
+      driver.DRIVER = 'Best of the Rest!';
+      let bestOfRest = this.f1DriversChampionship.slice(13, 20);
+      bestOfRest.forEach((x) => {
+        this.constructorTeams[conIndex].DriverNumbers.push(x.NO);
+      });
+    } else {
+      this.constructorTeams[conIndex].DriverNumbers.push(driver.NO);
     }
 
-    this.constructorDisplay[this.listIndex].Driver = driver;
+    this.constructorDisplay[this.listIndex].Driver = driver.DRIVER;
+
     this.constructorTeams[conIndex].Drivers.push(driver);
-    this.constructorTeams[conIndex].DriverNumbers.push(driverLabel.number);
 
     if (this.listIndex < 7) {
       this.topDrivers.splice(indexSelected, 1);
@@ -248,6 +232,7 @@ export class AppComponent {
   // Opening Page -> PostRace Step 1 (Constructors Champ)
   onPostRaceWeekend() {
     this.isOpeningPage = false;
+    this.setUpDriversListDropDown();
     this.isPostRaceWeekend = true;
   }
 
@@ -260,6 +245,7 @@ export class AppComponent {
   // PostRace Step 1 (Constructors Champ) -> PostRace Step 2 (Results)
   onPostRaceConstructorComplete() {
     this.isPostRaceWeekend = false;
+
     this.isPostRaceEnterResults = true;
   }
 
@@ -274,6 +260,28 @@ export class AppComponent {
   onPostRaceSetConstructorTeamsJson() {
     this.onSetConstructorTeamsJson();
     this.isDriversEntered = true;
+  }
+
+  setUpDriversListDropDown() {
+    if (!this.f1DriversChampionship.length && this.f1DriversChampionship.length === 0) {
+      this.onSetDriversChampJson();
+    }
+    this.f1DriversOptions = this.f1DriversChampionship.slice(0,14)
+    this.f1DriversOptions[13].DRIVER = 'Best Of The Rest!';
+  }
+
+  setUpConstructorNumbers() {
+    this.constructorTeams.forEach(x => {
+      x.DriverNumbers.push(x.Drivers[0].NO);
+      if (x.Drivers[1].DRIVER === 'Best Of The Rest!') {
+        let bestOfRest = this.f1DriversChampionship.slice(13, 20);
+        bestOfRest.forEach((d) => {
+          x.DriverNumbers.push(d.NO);
+        });
+      } else {
+        x.DriverNumbers.push(x.Drivers[1].NO);
+      }
+    });
   }
 
   // Parse Race Results
@@ -313,7 +321,7 @@ export class AppComponent {
 
     this.constructorTeams.forEach((team) => {
       team.Drivers.forEach((driver) => {
-        let result = this.raceResults.find((x) => x.DRIVER === driver);
+        let result = this.raceResults.find((x) => x.NO === driver.NO);
         team.TotalPoints += result ? result.PTS : 0;
       });
     });
@@ -335,49 +343,15 @@ export class AppComponent {
 
   private setConstructor() {
     this.constructorTeams = [
-      {
-        Name: 'Gabe',
-        TotalPoints: 34,
-        Drivers: ['Carlos Sainz', 'Lando Norris'],
-        DriverNumbers: [],
-      },
-      {
-        Name: 'Zac',
-        TotalPoints: 25,
-        Drivers: ['Sergio Perez', 'Lance Stroll'],
-        DriverNumbers: [],
-      },
-      {
-        Name: 'Nick',
-        TotalPoints: 21,
-        Drivers: ['George Russell', 'Nico Hulkenberg'],
-        DriverNumbers: [],
-      },
-      {
-        Name: 'Jimmer',
-        TotalPoints: 20,
-        Drivers: ['Max Verstappen', 'Alexander Albon'],
-        DriverNumbers: [],
-      },
-      {
-        Name: 'Jake',
-        TotalPoints: 15,
-        Drivers: ['Charles Leclerc', 'Oscar Piastri'],
-        DriverNumbers: [],
-      },
-      {
-        Name: 'Kristin',
-        TotalPoints: 13,
-        Drivers: ['Fernando Alonso', 'Pierre Gasly'],
-        DriverNumbers: [],
-      },
-      {
-        Name: 'Joey',
-        TotalPoints: 10,
-        Drivers: ['Lewis Hamilton', 'Esteban Ocon'],
-        DriverNumbers: [],
-      },
+      { Name: 'Jimmer', TotalPoints: 90, Drivers: [], DriverNumbers: [] },
+      { Name: 'Joey', TotalPoints: 90, Drivers: [], DriverNumbers: [] },
+      { Name: 'Gabe', TotalPoints: 81, Drivers: [], DriverNumbers: [] },
+      { Name: 'Jake', TotalPoints: 78, Drivers: [], DriverNumbers: [] },
+      { Name: 'Nick', TotalPoints: 72, Drivers: [], DriverNumbers: [] },
+      { Name: 'Zac', TotalPoints: 71, Drivers: [], DriverNumbers: [] },
+      { Name: 'Kristin', TotalPoints: 63, Drivers: [], DriverNumbers: [] },
     ];
+
     this.isDriversEntered = true;
   }
 
@@ -391,32 +365,30 @@ export class AppComponent {
     'Jimmer',
   ];
 
-  // can be automated by number of drivers we have
-  topDrivers: number[] = [1, 2, 3, 4, 5, 6, 7];
-  secondDrivers: number[] = [8, 9, 10, 11, 12, 13, 14];
-
-  f1DriversChampionship = [
-    { position: 1,  number: 0, driver: 'Max Verstappen' },
-    { position: 2,  number: 0, driver: 'Sergio Perez' },
-    { position: 3,  number: 0, driver: 'Fernando Alonso' },
-    { position: 4,  number: 0, driver: 'Lewis Hamilton' },
-    { position: 5,  number: 0, driver: 'Carlos Sainz' },
-    { position: 6,  number: 0, driver: 'George Russell' },
-    { position: 7,  number: 0, driver: 'Charles Leclerc' },
-    { position: 8,  number: 0, driver: 'Lance Stroll' },
-    { position: 9,  number: 0, driver: 'Lando Norris' },
-    { position: 10, number: 0,  driver: 'Esteban Ocon' },
-    { position: 11, number: 0,  driver: 'Oscar Piastri' },
-    { position: 12, number: 0,  driver: 'Pierre Gasly' },
-    { position: 13, number: 0,  driver: 'Alexander Albon' },
-    { position: 14, number: 0,  driver: 'Nico Hulkenberg' },
-    { position: 15, number: 0,  driver: 'Valtteri Bottas' },
-    { position: 16, number: 0,  driver: 'Zhou Guanyu' },
-    { position: 17, number: 0,  driver: 'Yuki Tsunoda' },
-    { position: 18, number: 0,  driver: 'Kevin Magnussen' },
-    { position: 19, number: 0,  driver: 'Logan Sargeant' },
-    { position: 20, number: 0,  driver: 'DANNY' },
-  ];
+  // f1DriversChampionshipTest = [
+  //   { position: 1, driver: 'Max Verstappen', number: 0 },
+  //   { position: 2, driver: 'Sergio Perez', number: 0 },
+  //   { position: 3, driver: 'Fernando Alonso', number: 0 },
+  //   { position: 4, driver: 'Lewis Hamilton', number: 0 },
+  //   { position: 5, driver: 'Carlos Sainz', number: 0 },
+  //   { position: 6, driver: 'Charles Leclerc', number: 0 },
+  //   { position: 7, driver: 'George Russell', number: 0 },
+  //   { position: 8, driver: 'Lando Norris', number: 0 },
+  //   { position: 9, driver: 'Lance Stroll', number: 0 },
+  //   { position: 10, driver: 'Pierre Gasly', number: 0 },
+  //   { position: 11, driver: 'Esteban Ocon', number: 0 },
+  //   { position: 12, driver: 'Oscar Piastri', number: 0 },
+  //   { position: 13, driver: 'Alexander Albon', number: 0 },
+  //   { position: 14, driver: 'Nico Hulkenberg', number: 0 },
+  //   { position: 15, driver: 'Valtteri Bottas', number: 0 },
+  //   { position: 16, driver: 'Zhou Guanyu', number: 0 },
+  //   { position: 17, driver: 'Yuki Tsunoda', number: 0 },
+  //   { position: 18, driver: 'Kevin Magnussen', number: 0 },
+  //   { position: 19, driver: 'Logan Sargeant', number: 0 },
+  //   { position: 20, driver: 'Nyck De Vries', number: 0 },
+  //   { position: 21, driver: 'Daniel Ricciardo', number: 0 },
+  //   { position: 22, driver: 'Liam Lawson', number: 0 },
+  // ];
 
   // // Test the function with the provided results string
   raceResultsStr: string = `
@@ -443,44 +415,34 @@ export class AppComponent {
   NC	10	Pierre Gasly	ALPINE RENAULT	1	DNF	0
   `;
 
+  setDriversChampJson() {
+    this.driversChampJson = `
+    POS	DRIVER	NATIONALITY	CAR	PTS
+1	Max Verstappen	NED	RED BULL RACING HONDA RBPT	374
+2	Sergio Perez	MEX	RED BULL RACING HONDA RBPT	223
+3	Lewis Hamilton	GBR	MERCEDES	180
+4	Fernando Alonso	ESP	ASTON MARTIN ARAMCO MERCEDES	170
+5	Carlos Sainz	ESP	FERRARI	142
+6	Charles Leclerc	MON	FERRARI	123
+7	George Russell	GBR	MERCEDES	109
+8	Lando Norris	GBR	MCLAREN MERCEDES	97
+9	Lance Stroll	CAN	ASTON MARTIN ARAMCO MERCEDES	47
+10	Pierre Gasly	FRA	ALPINE RENAULT	45
+11	Oscar Piastri	AUS	MCLAREN MERCEDES	42
+12	Esteban Ocon	FRA	ALPINE RENAULT	36
+13	Alexander Albon	THA	WILLIAMS MERCEDES	21
+14	Nico Hulkenberg	GER	HAAS FERRARI	9
+15	Valtteri Bottas	FIN	ALFA ROMEO FERRARI	6
+16	Zhou Guanyu	CHN	ALFA ROMEO FERRARI	4
+17	Yuki Tsunoda	JPN	ALPHATAURI HONDA RBPT	3
+18	Kevin Magnussen	DEN	HAAS FERRARI	3
+19	Liam Lawson	NZL	ALPHATAURI HONDA RBPT	2
+20	Logan Sargeant	USA	WILLIAMS MERCEDES	0
+21	Nyck De Vries	NED	ALPHATAURI HONDA RBPT	0
+22	Daniel Ricciardo	AUS	ALPHATAURI HONDA RBPT	0
+    `;
+  }
+
   // const parsedResults = this.parseF1Results(resultsString);
   // console.log(parsedResults);
-
-  hungaryChamp: ConstructorChamp[] = [
-    new ConstructorChamp({
-      TotalPoints: 0,
-      Name: 'Gabe',
-      Drivers: ['Max Verstappen', 'Esteban Ocon'],
-    }),
-    new ConstructorChamp({
-      TotalPoints: 0,
-      Name: 'Nick',
-      Drivers: ['Fernando Alonso', 'Lando Norris'],
-    }),
-    new ConstructorChamp({
-      TotalPoints: 0,
-      Name: 'Joey',
-      Drivers: ['George Russell', 'Best of the Rest!'],
-    }),
-    new ConstructorChamp({
-      TotalPoints: 0,
-      Name: 'Kristin',
-      Drivers: ['Charles Leclerc', 'Lance Stroll'],
-    }),
-    new ConstructorChamp({
-      TotalPoints: 0,
-      Name: 'Jake',
-      Drivers: ['Carlos Sainz', 'Pierre Gasly'],
-    }),
-    new ConstructorChamp({
-      TotalPoints: 0,
-      Name: 'Jimmer',
-      Drivers: ['Lewis Hamilton', 'Alexander Albon'],
-    }),
-    new ConstructorChamp({
-      TotalPoints: 0,
-      Name: 'Zac',
-      Drivers: ['Sergio Perez', 'Oscar Piastri'],
-    }),
-  ];
 }
