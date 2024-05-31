@@ -132,11 +132,30 @@ export class AppComponent {
       return driver;
     });
 
+    this.removeNonActiveDrivers(drivers);
+
     drivers.forEach((x) => {
       x.NO = this.driverList.find((d) => d.DRIVER === x.DRIVER)?.NO as number;
     });
 
     this.f1DriversChampionship = drivers;
+  }
+
+  removeNonActiveDrivers(drivers: Formula1Driver[]) {
+    let posCorrection: number = 0;
+    let nonActiveDrivers: string[] = ['Oliver Bearman'];
+
+    for (let i: number = 0; i < drivers.length; i++) {
+      if (nonActiveDrivers.includes(drivers[i].DRIVER)) {
+        // if the nonActive driver exists, remove them and set back the index since the driver is now removed
+        drivers.splice(i, 1);
+        i--;
+        posCorrection += 1;
+      } else {
+        //
+        drivers[i].POS -= posCorrection;
+      }
+    }
   }
 
   // Grand Prix Team Json
@@ -146,6 +165,9 @@ export class AppComponent {
 
   onSetConstructorTeamsJson() {
     this.constructorTeams = JSON.parse(this.constructorTeamsJson);
+    if (this.f1DriversChampionship != null && this.f1DriversChampionship.length > 0) {
+      this.setDriversChampOrderByConstructor();
+    }
   }
 
   // Constructor Random Order Generation
@@ -264,6 +286,12 @@ export class AppComponent {
     this.isDriversEntered = true;
   }
 
+  onTestPrintConstructorTeamsJson() {
+    this.onGetConstructorTeamsJson();
+    console.log(this.constructorTeams);
+  }
+
+  // triggered when going from home page to postrace page for setting up constructors
   setUpDriversListDropDown() {
     if (!this.f1DriversChampionship.length && this.f1DriversChampionship.length === 0) {
       this.onSetDriversChampJson();
@@ -272,6 +300,21 @@ export class AppComponent {
     this.f1DriversOptions[13].DRIVER = 'Best Of The Rest!';
   }
 
+  // used in postrace on constructor json set
+  setDriversChampOrderByConstructor() {
+    let driverChampOrder: Formula1Driver[] = [];
+
+    this.constructorTeams.forEach(x => {
+      x.Drivers.forEach(d => {
+        driverChampOrder.push(d);
+      });
+    });
+
+    driverChampOrder.sort((a,b) => a.POS - b.POS);
+    this.f1DriversOptions = driverChampOrder;
+  }
+
+  // TODO: dont think this is used anywhere
   setUpConstructorNumbers() {
     this.constructorTeams.forEach(x => {
       x.DriverNumbers.push(x.Drivers[0].NO);
@@ -320,18 +363,19 @@ export class AppComponent {
 
   onCalculateConstructors() {
     this.raceResults = this.parseF1Results(this.raceResultsInput);
+    var isSprint: boolean = (this.raceResults[0].PTS < 10);
 
     this.constructorTeams.forEach((team) => {
       team.Drivers.forEach((driver) => {
         let result = this.raceResults.find((x) => x.NO === driver.NO);
-        team.TotalPoints += result ? result.PTS : 0;
+        team.TotalPoints += result ? this.getAlterPoints(result, isSprint) : 0;
       });
     });
 
     this.constructorTeams.sort((a, b) => b.TotalPoints - a.TotalPoints);
 
     // if the race is a sprint, do not clear out the drivers for each constructor
-    if (this.raceResults[0].PTS > 12) {
+    if (!isSprint) {
       this.constructorTeams.forEach((x) => {
         x.Drivers = [];
         x.DriverNumbers = [];
@@ -342,7 +386,49 @@ export class AppComponent {
     this.isPostRaceResultsEntered = true;
   }
 
-  ////////////////////////////   'autofilled' data   /////////////////////////////
+  getAlterPoints(driverResult: F1Result, isSprint: boolean): number {
+    var subtractVal: number = 0;
+
+    if (isSprint) {
+      return driverResult.PTS;
+    }
+
+    switch (driverResult.POS) {
+      case '1':
+        subtractVal = 15;
+        break;
+      case '2':
+        subtractVal = 9;
+        break;
+      case '3':
+        subtractVal = 7;
+        break;
+      case '4':
+        subtractVal = 5;
+        break;
+      case '5':
+        subtractVal = 4;
+        break;
+      case '6':
+        subtractVal = 3;
+        break;
+      case '7':
+        subtractVal = 2;
+        break;
+      case '8':
+        subtractVal = 1;
+        break;
+      default:
+        subtractVal = 0;
+        break;
+    }
+
+    return driverResult.PTS - subtractVal;
+  }
+
+
+
+  ////////////////////////////////////////////////   'autofilled' data   /////////////////////////////////////////////////////
 
   private setConstructor() {
     this.constructorTeams = this.testData.getCurrentChampStandings();
@@ -440,3 +526,13 @@ export class AppComponent {
   // const parsedResults = this.parseF1Results(resultsString);
   // console.log(parsedResults);
 }
+
+// [{"Name":"Jimmer","TotalPoints":0,"Drivers":[{"POS":4,"DRIVER":"Carlos Sainz","NATIONALITY":"ESP","CAR":"FERRARI","PTS":40,"NO":55},{"POS":8,"DRIVER":"Fernando Alonso","NATIONALITY":"ESP","CAR":"ASTON MARTIN ARAMCO MERCEDES","PTS":16,"NO":14}],"DriverNumbers":[55,14]},
+// {"Name":"Joey","TotalPoints":0,"Drivers":[{"POS":3,"DRIVER":"Sergio Perez","NATIONALITY":"MEX","CAR":"RED BULL RACING HONDA RBPT","PTS":46,"NO":11},{"POS":15,"DRIVER":"Alexander Albon","NATIONALITY":"THA","CAR":"WILLIAMS MERCEDES","PTS":0,"NO":23}],"DriverNumbers":[11,23]},
+// {"Name":"Gabe","TotalPoints":0,"Drivers":[{"POS":6,"DRIVER":"Lando Norris","NATIONALITY":"GBR","CAR":"MCLAREN MERCEDES","PTS":27,"NO":4},{"POS":10,"DRIVER":"Lewis Hamilton","NATIONALITY":"GBR","CAR":"MERCEDES","PTS":8,"NO":44}],"DriverNumbers":[4,44]},
+// {"Name":"Jake","TotalPoints":0,"Drivers":[{"POS":1,"DRIVER":"Max Verstappen","NATIONALITY":"NED","CAR":"RED BULL RACING HONDA RBPT","PTS":51,"NO":1},{"POS":13,"DRIVER":"Nico Hulkenberg","NATIONALITY":"GER","CAR":"HAAS FERRARI","PTS":3,"NO":27}],"DriverNumbers":[1,27]},
+// {"Name":"Nick","TotalPoints":0,"Drivers":[{"POS":2,"DRIVER":"Charles Leclerc","NATIONALITY":"MON","CAR":"FERRARI","PTS":47,"NO":16},{"POS":11,"DRIVER":"Yuki Tsunoda","NATIONALITY":"JPN","CAR":"RB HONDA RBPT","PTS":6,"NO":22}],"DriverNumbers":[16,22]},
+// {"Name":"Zac","TotalPoints":0,"Drivers":[{"POS":7,"DRIVER":"George Russell","NATIONALITY":"GBR","CAR":"MERCEDES","PTS":18,"NO":63},{"POS":14,"DRIVER":"Best of the Rest!","NATIONALITY":"DEN","CAR":"HAAS FERRARI","PTS":1,"NO":20}],"DriverNumbers":[63,23,24,null,31,10,77,2]},
+// {"Name":"Kristin","TotalPoints":0,"Drivers":[{"POS":5,"DRIVER":"Oscar Piastri","NATIONALITY":"AUS","CAR":"MCLAREN MERCEDES","PTS":28,"NO":81},{"POS":9,"DRIVER":"Lance Stroll","NATIONALITY":"CAN","CAR":"ASTON MARTIN ARAMCO MERCEDES","PTS":9,"NO":18}],"DriverNumbers":[81,18]}]
+
+
