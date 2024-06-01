@@ -5,9 +5,19 @@ import { ConstructorChamp } from '../models/constructor-champ';
 import { Formula1Driver } from '../models/f1-driver';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TestData {
+
+    getCurrentChampStandings() {
+        // THIS IS THE COMPETITION
+        return this.getConstructBlank();
+    }
+
+    getCurrentDriversChampStr() {
+        // THESE ARE THE DRIVERS
+        return this.getDriversStandingsAfterMonaco();
+    }
 
     getDrivers(): Formula1Driver[] {
         return [
@@ -35,44 +45,75 @@ export class TestData {
         ]
     }
 
+    private getConstructBlank() {
+        return [
+          {
+            Name: 'Jake',
+            TotalPoints: 0,
+            Drivers: [],
+            DriverNumbers: [],
+          },
+          {
+            Name: 'Zac',
+            TotalPoints: 0,
+            Drivers: [],
+            DriverNumbers: [],
+          },
+          {
+            Name: 'Joey',
+            TotalPoints: 0,
+            Drivers: [],
+            DriverNumbers: [],
+          },
+          {
+            Name: 'Jimmer',
+            TotalPoints: 0,
+            Drivers: [],
+            DriverNumbers: [],
+          },
+          {
+            Name: 'Gabe',
+            TotalPoints: 0,
+            Drivers: [],
+            DriverNumbers: [],
+          },
+          {
+            Name: 'Kristin',
+            TotalPoints: 0,
+            Drivers: [],
+            DriverNumbers: [],
+          },
+          {
+            Name: 'Nick',
+            TotalPoints: 0,
+            Drivers: [],
+            DriverNumbers: [],
+          },
+        ];
+    }
 
-    // getHungaryConstructChamp() {
-    //     return [
-    //         new ConstructorChamp({
-    //         TotalPoints: 0,
-    //         Name: 'Gabe',
-    //         Drivers: ['Max Verstappen', 'Esteban Ocon'],
-    //         }),
-    //         new ConstructorChamp({
-    //         TotalPoints: 0,
-    //         Name: 'Nick',
-    //         Drivers: ['Fernando Alonso', 'Lando Norris'],
-    //         }),
-    //         new ConstructorChamp({
-    //         TotalPoints: 0,
-    //         Name: 'Joey',
-    //         Drivers: ['George Russell', 'Best of the Rest!'],
-    //         }),
-    //         new ConstructorChamp({
-    //         TotalPoints: 0,
-    //         Name: 'Kristin',
-    //         Drivers: ['Charles Leclerc', 'Lance Stroll'],
-    //         }),
-    //         new ConstructorChamp({
-    //         TotalPoints: 0,
-    //         Name: 'Jake',
-    //         Drivers: ['Carlos Sainz', 'Pierre Gasly'],
-    //         }),
-    //         new ConstructorChamp({
-    //         TotalPoints: 0,
-    //         Name: 'Jimmer',
-    //         Drivers: ['Lewis Hamilton', 'Alexander Albon'],
-    //         }),
-    //         new ConstructorChamp({
-    //         TotalPoints: 0,
-    //         Name: 'Zac',
-    //         Drivers: ['Sergio Perez', 'Oscar Piastri'],
-    //         }),
-    //     ];
-    // }
+    getDriversStandingsAfterMonaco(): string {
+        return `POS	DRIVER	NATIONALITY	CAR	PTS
+        1	Max Verstappen	NED	RED BULL RACING HONDA RBPT	169
+        2	Charles Leclerc	MON	FERRARI	138
+        3	Lando Norris	GBR	MCLAREN MERCEDES	113
+        4	Carlos Sainz	ESP	FERRARI	108
+        5	Sergio Perez	MEX	RED BULL RACING HONDA RBPT	107
+        6	Oscar Piastri	AUS	MCLAREN MERCEDES	71
+        7	George Russell	GBR	MERCEDES	54
+        8	Lewis Hamilton	GBR	MERCEDES	42
+        9	Fernando Alonso	ESP	ASTON MARTIN ARAMCO MERCEDES	33
+        10	Yuki Tsunoda	JPN	RB HONDA RBPT	19
+        11	Lance Stroll	CAN	ASTON MARTIN ARAMCO MERCEDES	11
+        12	Oliver Bearman	GBR	FERRARI	6
+        13	Nico Hulkenberg	GER	HAAS FERRARI	6
+        14	Daniel Ricciardo	AUS	RB HONDA RBPT	5
+        15	Alexander Albon	THA	WILLIAMS MERCEDES	2
+        16	Esteban Ocon	FRA	ALPINE RENAULT	1
+        17	Kevin Magnussen	DEN	HAAS FERRARI	1
+        18	Pierre Gasly	FRA	ALPINE RENAULT	1
+        19	Zhou Guanyu	CHN	KICK SAUBER FERRARI	0
+        20	Valtteri Bottas	FIN	KICK SAUBER FERRARI	0
+        21	Logan Sargeant	USA	WILLIAMS MERCEDES	0`;
+    }
 }

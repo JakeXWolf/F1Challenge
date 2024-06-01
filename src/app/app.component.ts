@@ -53,7 +53,9 @@ export class AppComponent {
     //test
     this.raceResultsInput = this.raceResultsStr;
     this.setConstructor();
-    this.setDriversChampJson();
+    // this.setDriversChampJson();
+    this.driversChampJson = this.testData.getCurrentDriversChampStr();
+    this.onSetDriversChampJson();
   }
 
   private setConstructorTeams() {
@@ -376,6 +378,7 @@ export class AppComponent {
     if (!isSprint) {
       this.constructorTeams.forEach((x) => {
         x.Drivers = [];
+        x.DriverNumbers = [];
       });
     }
 
@@ -428,16 +431,7 @@ export class AppComponent {
   ////////////////////////////////////////////////   'autofilled' data   /////////////////////////////////////////////////////
 
   private setConstructor() {
-    this.constructorTeams = [
-      { Name: 'Jimmer', TotalPoints: 0, Drivers: [], DriverNumbers: [] },
-      { Name: 'Joey', TotalPoints: 0, Drivers: [], DriverNumbers: [] },
-      { Name: 'Gabe', TotalPoints: 0, Drivers: [], DriverNumbers: [] },
-      { Name: 'Jake', TotalPoints: 0, Drivers: [], DriverNumbers: [] },
-      { Name: 'Nick', TotalPoints: 0, Drivers: [], DriverNumbers: [] },
-      { Name: 'Zac', TotalPoints: 0, Drivers: [], DriverNumbers: [] },
-      { Name: 'Kristin', TotalPoints: 0, Drivers: [], DriverNumbers: [] },
-    ];
-
+    this.constructorTeams = this.testData.getCurrentChampStandings();
     this.isDriversEntered = true;
   }
 
@@ -501,31 +495,31 @@ export class AppComponent {
   NC	10	Pierre Gasly	ALPINE RENAULT	1	DNF	0
   `;
 
-  setDriversChampJson() {
-    this.driversChampJson = `
-    POS	DRIVER	NATIONALITY	CAR	PTS
-1	Max Verstappen	NED	RED BULL RACING HONDA RBPT	110
-2	Sergio Perez	MEX	RED BULL RACING HONDA RBPT	85
-3	Charles Leclerc	MON	FERRARI	76
-4	Carlos Sainz	ESP	FERRARI	69
-5	Lando Norris	GBR	MCLAREN MERCEDES	58
-6	Oscar Piastri	AUS	MCLAREN MERCEDES	38
-7	George Russell	GBR	MERCEDES	33
-8	Fernando Alonso	ESP	ASTON MARTIN ARAMCO MERCEDES	31
-9	Lewis Hamilton	GBR	MERCEDES	19
-10	Lance Stroll	CAN	ASTON MARTIN ARAMCO MERCEDES	9
-11	Yuki Tsunoda	JPN	RB HONDA RBPT	7
-12	Nico Hulkenberg	GER	HAAS FERRARI	4
-13	Kevin Magnussen	DEN	HAAS FERRARI	1
-14	Alexander Albon	THA	WILLIAMS MERCEDES	0
-15	Esteban Ocon	FRA	ALPINE RENAULT	0
-16	Zhou Guanyu	CHN	KICK SAUBER FERRARI	0
-17	Daniel Ricciardo	AUS	RB HONDA RBPT	0
-18	Pierre Gasly	FRA	ALPINE RENAULT	0
-19	Valtteri Bottas	FIN	KICK SAUBER FERRARI	0
-20	Logan Sargeant	USA	WILLIAMS MERCEDES	0
-    `;
-  }
+//   setDriversChampJson() {
+//     this.driversChampJson = `
+//     POS	DRIVER	NATIONALITY	CAR	PTS
+// 1	Max Verstappen	NED	RED BULL RACING HONDA RBPT	110
+// 2	Sergio Perez	MEX	RED BULL RACING HONDA RBPT	85
+// 3	Charles Leclerc	MON	FERRARI	76
+// 4	Carlos Sainz	ESP	FERRARI	69
+// 5	Lando Norris	GBR	MCLAREN MERCEDES	58
+// 6	Oscar Piastri	AUS	MCLAREN MERCEDES	38
+// 7	George Russell	GBR	MERCEDES	33
+// 8	Fernando Alonso	ESP	ASTON MARTIN ARAMCO MERCEDES	31
+// 9	Lewis Hamilton	GBR	MERCEDES	19
+// 10	Lance Stroll	CAN	ASTON MARTIN ARAMCO MERCEDES	9
+// 11	Yuki Tsunoda	JPN	RB HONDA RBPT	7
+// 12	Nico Hulkenberg	GER	HAAS FERRARI	4
+// 13	Kevin Magnussen	DEN	HAAS FERRARI	1
+// 14	Alexander Albon	THA	WILLIAMS MERCEDES	0
+// 15	Esteban Ocon	FRA	ALPINE RENAULT	0
+// 16	Zhou Guanyu	CHN	KICK SAUBER FERRARI	0
+// 17	Daniel Ricciardo	AUS	RB HONDA RBPT	0
+// 18	Pierre Gasly	FRA	ALPINE RENAULT	0
+// 19	Valtteri Bottas	FIN	KICK SAUBER FERRARI	0
+// 20	Logan Sargeant	USA	WILLIAMS MERCEDES	0
+//     `;
+//   }
 
   // const parsedResults = this.parseF1Results(resultsString);
   // console.log(parsedResults);
