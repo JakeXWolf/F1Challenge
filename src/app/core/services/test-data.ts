@@ -6,17 +6,19 @@ import { Formula1Driver } from '../models/f1-driver';
 
 @Injectable({
   providedIn: 'root',
+  providedIn: 'root',
 })
 export class TestData {
-  getCurrentChampStandings() {
-    // THIS IS THE COMPETITION
-    return this.getConstructAfterBrazil();
-  }
 
-  getCurrentDriversChampStr() {
-    // THESE ARE THE DRIVERS
-    return this.getDriversStrAfterBrazil();
-  }
+    getCurrentChampStandings() {
+        // THIS IS THE COMPETITION
+        return this.getConstructBlank();
+    }
+
+    getCurrentDriversChampStr() {
+        // THESE ARE THE DRIVERS
+        return this.getDriversStandingsAfterMonaco();
+    }
 
     getDrivers(): Formula1Driver[] {
         return [
@@ -44,245 +46,75 @@ export class TestData {
         ]
     }
 
-    getConstructAfterBrazil() {
+    private getConstructBlank() {
         return [
-            { Name: 'Jimmer', TotalPoints: 0, Drivers: [], DriverNumbers: [] },
-            { Name: 'Joey', TotalPoints: 0, Drivers: [], DriverNumbers: [] },
-            { Name: 'Gabe', TotalPoints: 0, Drivers: [], DriverNumbers: [] },
-            { Name: 'Jake', TotalPoints: 0, Drivers: [], DriverNumbers: [] },
-            { Name: 'Nick', TotalPoints: 0, Drivers: [], DriverNumbers: [] },
-            { Name: 'Zac', TotalPoints: 0, Drivers: [], DriverNumbers: [] },
-            { Name: 'Kristin', TotalPoints: 0, Drivers: [], DriverNumbers: [] },
+          {
+            Name: 'Jake',
+            TotalPoints: 0,
+            Drivers: [],
+            DriverNumbers: [],
+          },
+          {
+            Name: 'Zac',
+            TotalPoints: 0,
+            Drivers: [],
+            DriverNumbers: [],
+          },
+          {
+            Name: 'Joey',
+            TotalPoints: 0,
+            Drivers: [],
+            DriverNumbers: [],
+          },
+          {
+            Name: 'Jimmer',
+            TotalPoints: 0,
+            Drivers: [],
+            DriverNumbers: [],
+          },
+          {
+            Name: 'Gabe',
+            TotalPoints: 0,
+            Drivers: [],
+            DriverNumbers: [],
+          },
+          {
+            Name: 'Kristin',
+            TotalPoints: 0,
+            Drivers: [],
+            DriverNumbers: [],
+          },
+          {
+            Name: 'Nick',
+            TotalPoints: 0,
+            Drivers: [],
+            DriverNumbers: [],
+          },
         ];
-      }
-    
-      getDriversStrAfterBrazil() {
+    }
+
+    getDriversStandingsAfterMonaco(): string {
         return `POS	DRIVER	NATIONALITY	CAR	PTS
-    1	Max Verstappen	NED	RED BULL RACING HONDA RBPT	524
-    2	Sergio Perez	MEX	RED BULL RACING HONDA RBPT	258
-    3	Lewis Hamilton	GBR	MERCEDES	226
-    4	Fernando Alonso	ESP	ASTON MARTIN ARAMCO MERCEDES	198
-    5	Lando Norris	GBR	MCLAREN MERCEDES	195
-    6	Carlos Sainz	ESP	FERRARI	192
-    7	Charles Leclerc	MON	FERRARI	170
-    8	George Russell	GBR	MERCEDES	156
-    9	Oscar Piastri	AUS	MCLAREN MERCEDES	87
-    10	Lance Stroll	CAN	ASTON MARTIN ARAMCO MERCEDES	63
-    11	Pierre Gasly	FRA	ALPINE RENAULT	62
-    12	Esteban Ocon	FRA	ALPINE RENAULT	46
-    13	Alexander Albon	THA	WILLIAMS MERCEDES	27
-    14	Yuki Tsunoda	JPN	ALPHATAURI HONDA RBPT	13
-    15	Valtteri Bottas	FIN	ALFA ROMEO FERRARI	10
-    16	Nico Hulkenberg	GER	HAAS FERRARI	9
-    17	Daniel Ricciardo	AUS	ALPHATAURI HONDA RBPT	6
-    18	Zhou Guanyu	CHN	ALFA ROMEO FERRARI	6
-    19	Kevin Magnussen	DEN	HAAS FERRARI	3
-    20	Liam Lawson	NZL	ALPHATAURI HONDA RBPT	2
-    21	Logan Sargeant	USA	WILLIAMS MERCEDES	1
-    22	Nyck De Vries	NED	ALPHATAURI HONDA RBPT	0`;
-      }
-
-  // getHungaryConstructChamp() {
-  //     return [
-  //         new ConstructorChamp({
-  //         TotalPoints: 0,
-  //         Name: 'Gabe',
-  //         Drivers: ['Max Verstappen', 'Esteban Ocon'],
-  //         }),
-  //         new ConstructorChamp({
-  //         TotalPoints: 0,
-  //         Name: 'Nick',
-  //         Drivers: ['Fernando Alonso', 'Lando Norris'],
-  //         }),
-  //         new ConstructorChamp({
-  //         TotalPoints: 0,
-  //         Name: 'Joey',
-  //         Drivers: ['George Russell', 'Best of the Rest!'],
-  //         }),
-  //         new ConstructorChamp({
-  //         TotalPoints: 0,
-  //         Name: 'Kristin',
-  //         Drivers: ['Charles Leclerc', 'Lance Stroll'],
-  //         }),
-  //         new ConstructorChamp({
-  //         TotalPoints: 0,
-  //         Name: 'Jake',
-  //         Drivers: ['Carlos Sainz', 'Pierre Gasly'],
-  //         }),
-  //         new ConstructorChamp({
-  //         TotalPoints: 0,
-  //         Name: 'Jimmer',
-  //         Drivers: ['Lewis Hamilton', 'Alexander Albon'],
-  //         }),
-  //         new ConstructorChamp({
-  //         TotalPoints: 0,
-  //         Name: 'Zac',
-  //         Drivers: ['Sergio Perez', 'Oscar Piastri'],
-  //         }),
-  //     ];
-  // }
-
-  resultsAfterQatarSprint = [
-    {
-      Name: 'Jake',
-      TotalPoints: 128,
-      Drivers: [
-        {
-          POS: 7,
-          DRIVER: 'Lando Norris',
-          NATIONALITY: 'GBR',
-          CAR: 'MCLAREN MERCEDES',
-          PTS: 115,
-          NO: 4,
-        },
-        {
-          POS: 10,
-          DRIVER: 'Lance Stroll',
-          NATIONALITY: 'CAN',
-          CAR: 'ASTON MARTIN ARAMCO MERCEDES',
-          PTS: 47,
-          NO: 18,
-        },
-      ],
-      DriverNumbers: [],
-    },
-    {
-      Name: 'Zac',
-      TotalPoints: 116,
-      Drivers: [
-        {
-          POS: 3,
-          DRIVER: 'Lewis Hamilton',
-          NATIONALITY: 'GBR',
-          CAR: 'MERCEDES',
-          PTS: 190,
-          NO: 44,
-        },
-        {
-          POS: 8,
-          DRIVER: 'George Russell',
-          NATIONALITY: 'GBR',
-          CAR: 'MERCEDES',
-          PTS: 115,
-          NO: 63,
-        },
-      ],
-      DriverNumbers: [],
-    },
-    {
-      Name: 'Joey',
-      TotalPoints: 103,
-      Drivers: [
-        {
-          POS: 2,
-          DRIVER: 'Sergio Perez',
-          NATIONALITY: 'MEX',
-          CAR: 'RED BULL RACING HONDA RBPT',
-          PTS: 223,
-          NO: 11,
-        },
-        {
-          POS: 14,
-          DRIVER: 'Best Of The Rest!',
-          NATIONALITY: 'GER',
-          CAR: 'HAAS FERRARI',
-          PTS: 9,
-          NO: 27,
-        },
-      ],
-      DriverNumbers: [],
-    },
-    {
-      Name: 'Kristin',
-      TotalPoints: 99,
-      Drivers: [
-        {
-          POS: 1,
-          DRIVER: 'Max Verstappen',
-          NATIONALITY: 'NED',
-          CAR: 'RED BULL RACING HONDA RBPT',
-          PTS: 400,
-          NO: 1,
-        },
-        {
-          POS: 9,
-          DRIVER: 'Oscar Piastri',
-          NATIONALITY: 'AUS',
-          CAR: 'MCLAREN MERCEDES',
-          PTS: 57,
-          NO: 81,
-        },
-      ],
-      DriverNumbers: [],
-    },
-    {
-      Name: 'Jimmer',
-      TotalPoints: 98,
-      Drivers: [
-        {
-          POS: 6,
-          DRIVER: 'Charles Leclerc',
-          NATIONALITY: 'MON',
-          CAR: 'FERRARI',
-          PTS: 135,
-          NO: 16,
-        },
-        {
-          POS: 11,
-          DRIVER: 'Pierre Gasly',
-          NATIONALITY: 'FRA',
-          CAR: 'ALPINE RENAULT',
-          PTS: 46,
-          NO: 10,
-        },
-      ],
-      DriverNumbers: [],
-    },
-    {
-      Name: 'Gabe',
-      TotalPoints: 90,
-      Drivers: [
-        {
-          POS: 5,
-          DRIVER: 'Carlos Sainz',
-          NATIONALITY: 'ESP',
-          CAR: 'FERRARI',
-          PTS: 150,
-          NO: 55,
-        },
-        {
-          POS: 12,
-          DRIVER: 'Esteban Ocon',
-          NATIONALITY: 'FRA',
-          CAR: 'ALPINE RENAULT',
-          PTS: 38,
-          NO: 31,
-        },
-      ],
-      DriverNumbers: [],
-    },
-    {
-      Name: 'Nick',
-      TotalPoints: 75,
-      Drivers: [
-        {
-          POS: 4,
-          DRIVER: 'Fernando Alonso',
-          NATIONALITY: 'ESP',
-          CAR: 'ASTON MARTIN ARAMCO MERCEDES',
-          PTS: 174,
-          NO: 14,
-        },
-        {
-          POS: 13,
-          DRIVER: 'Alexander Albon',
-          NATIONALITY: 'THA',
-          CAR: 'WILLIAMS MERCEDES',
-          PTS: 21,
-          NO: 23,
-        },
-      ],
-      DriverNumbers: [],
-    },
-  ];
+        1	Max Verstappen	NED	RED BULL RACING HONDA RBPT	169
+        2	Charles Leclerc	MON	FERRARI	138
+        3	Lando Norris	GBR	MCLAREN MERCEDES	113
+        4	Carlos Sainz	ESP	FERRARI	108
+        5	Sergio Perez	MEX	RED BULL RACING HONDA RBPT	107
+        6	Oscar Piastri	AUS	MCLAREN MERCEDES	71
+        7	George Russell	GBR	MERCEDES	54
+        8	Lewis Hamilton	GBR	MERCEDES	42
+        9	Fernando Alonso	ESP	ASTON MARTIN ARAMCO MERCEDES	33
+        10	Yuki Tsunoda	JPN	RB HONDA RBPT	19
+        11	Lance Stroll	CAN	ASTON MARTIN ARAMCO MERCEDES	11
+        12	Oliver Bearman	GBR	FERRARI	6
+        13	Nico Hulkenberg	GER	HAAS FERRARI	6
+        14	Daniel Ricciardo	AUS	RB HONDA RBPT	5
+        15	Alexander Albon	THA	WILLIAMS MERCEDES	2
+        16	Esteban Ocon	FRA	ALPINE RENAULT	1
+        17	Kevin Magnussen	DEN	HAAS FERRARI	1
+        18	Pierre Gasly	FRA	ALPINE RENAULT	1
+        19	Zhou Guanyu	CHN	KICK SAUBER FERRARI	0
+        20	Valtteri Bottas	FIN	KICK SAUBER FERRARI	0
+        21	Logan Sargeant	USA	WILLIAMS MERCEDES	0`;
+    }
 }
