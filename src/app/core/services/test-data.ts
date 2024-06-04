@@ -6,7 +6,6 @@ import { Formula1Driver } from '../models/f1-driver';
 
 @Injectable({
   providedIn: 'root',
-  providedIn: 'root',
 })
 export class TestData {
 
