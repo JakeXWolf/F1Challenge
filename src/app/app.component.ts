@@ -4,7 +4,9 @@ import { ConstructorChamp } from './core/models/constructor-champ';
 import { ConstructorOrder } from './core/models/constructor-order';
 import { F1Result } from './core/models/f1-results';
 import { Formula1Driver } from './core/models/f1-driver';
+
 import { TestData } from './core/services/test-data';
+import { DataService } from './core/services/data-service';
 
 @Component({
   selector: 'app-root',
@@ -42,9 +44,22 @@ export class AppComponent {
   f1DriversOptions: Formula1Driver[] = [];
   driverList: Formula1Driver[] = [];
 
-  constructor(public testData: TestData) {}
+  //TODO: TEST
+  cols = [
+    { field: 'POS', header: 'Place' },
+    { field: 'DRIVER', header: 'Name' }
+  ];
+
+  constructor(public testData: TestData, private dataService: DataService) {}
+
 
   ngOnInit() {
+    // added for doc stuff
+    this.dataService.fetchDocumentContent().subscribe(data => {
+      console.log(data);
+    });
+
+
     this.createOrderDisplay();
     this.setConstructorTeams();
 
@@ -57,9 +72,28 @@ export class AppComponent {
     this.driversChampJson = this.testData.getCurrentDriversChampStr();
     this.onSetDriversChampJson();
     // this.setDriversChampJson();
-    this.driversChampJson = this.testData.getCurrentDriversChampStr();
-    this.onSetDriversChampJson();
+    // this.driversChampJson = this.testData.getCurrentDriversChampStr();
+    // this.onSetDriversChampJson();
+
+
+    this.dataService.getConstructorBeforeWeekend().subscribe(data => {
+      this.constructorTeams = data;
+      if (this.f1DriversChampionship != null && this.f1DriversChampionship.length > 0) {
+        this.setDriversChampOrderByConstructor();
+      }
+      console.log(data)
+    });
   }
+
+  // fetchDocumentContent() {
+  //   const docId = '1GKAOen0a25cxv51M_LUHX5bZcE-bgE4U5yyRP_5u7BE';
+  //   const test = `https://docs.google.com/document/d/1GKAOen0a25cxv51M_LUHX5bZcE-bgE4U5yyRP_5u7BE/edit?usp=sharing`
+  //   const url = `https://docs.google.com/document/d/${docId}/export?format=txt`;
+
+  //   this.http.get(url, { responseType: 'text' }).subscribe((data) => {
+  //     console.log(data);
+  //   });
+  // }
 
   private setConstructorTeams() {
     this.constructorNames.forEach((x) => {
@@ -83,7 +117,38 @@ export class AppComponent {
   onDriversChampGoBack() {
     this.isPreRaceWeekend = false;
     this.isOpeningPage = true;
+
     window.scroll(0, 0);
+  }
+
+  onDriversRowReorderAlgorithm(item: any) {
+    // if theres no change then no action is needed
+    if (item.dragIndex === item.dropIndex) {
+      return;
+    }
+
+    // default is item moving from better to worse (lower index to higher index)
+    let start: number = item.dragIndex;
+    let end: number = item.dropIndex;
+
+    let shiftDirection: number = 1;
+
+    // set the shifted row's value
+    this.f1DriversChampionship[item.dropIndex].POS = item.dropIndex + 1;
+
+    // if item is moving from worse to better (higher index to lower index)
+    if (item.dragIndex > item.dropIndex) {
+      shiftDirection = -1;
+      start = item.dropIndex + 1;
+      end = item.dragIndex;
+    }
+
+    // shift all values between the reordered range
+    for (let i: number = start; i < end; i++) {
+      this.f1DriversChampionship[i].POS += shiftDirection;
+    }
+
+    // this.f1DriversChampionship.sort((a,b) => a.POS - b.POS);
   }
 
   // PreRace Step 1 (Drivers champ) -> PreRace Step 2 (Constructors)
@@ -116,33 +181,62 @@ export class AppComponent {
 
   // takes string copied from f1 page and parses into f1DriversChampionship obj
   // method inspired by Chat GPT
+  // onSetDriversChampJson() {
+  //   const input = this.driversChampJson;
+  //   const lines = input.trim().split('\n');
+  //   const headers = lines[0].split('\t');
+  //   const data = lines.slice(1).map((line) => line.split('\t'));
+
+  //   let drivers = data.map((row) => {
+  //     const driver: Formula1Driver = {} as Formula1Driver;
+  //     headers.forEach((header, index) => {
+  //       const value = row[index];
+  //       if (header === 'POS' || header === 'PTS') {
+  //         driver[header] = parseInt(value, 10);
+  //       } else {
+  //         driver[header] = value;
+  //       }
+  //     });
+  //     return driver;
+  //   });
+
+  //   this.removeNonActiveDrivers(drivers);
+
+  //   drivers.forEach((x) => {
+  //     x.NO = this.driverList.find((d) => d.DRIVER === x.DRIVER)?.NO as number;
+  //   });
+
+  //   this.f1DriversChampionship = drivers;
+  // }
   onSetDriversChampJson() {
     const input = this.driversChampJson;
-    const lines = input.trim().split('\n');
-    const headers = lines[0].split('\t');
-    const data = lines.slice(1).map((line) => line.split('\t'));
+    const lines = input.trim().split('\n\n');
+    const headers = lines.slice(0, 5).map(h => h.trim());
+    const data = lines.slice(5);
 
-    let drivers = data.map((row) => {
-      const driver: Formula1Driver = {} as Formula1Driver;
-      headers.forEach((header, index) => {
-        const value = row[index];
-        if (header === 'POS' || header === 'PTS') {
-          driver[header] = parseInt(value, 10);
-        } else {
-          driver[header] = value;
-        }
-      });
-      return driver;
-    });
+    let drivers = [];
+    for (let i = 0; i < data.length; i += 5) {
+        const driver: Formula1Driver = {} as Formula1Driver;
+
+        driver['POS'] = parseInt(data[i].trim(), 10);
+        driver['DRIVER'] = data[i + 1].trim();
+        driver['NATIONALITY'] = data[i + 2].trim();
+        driver['CAR'] = data[i + 3].trim();
+        driver['PTS'] = parseInt(data[i + 4].trim(), 10);
+
+        drivers.push(driver);
+    }
 
     this.removeNonActiveDrivers(drivers);
 
     drivers.forEach((x) => {
-      x.NO = this.driverList.find((d) => d.DRIVER === x.DRIVER)?.NO as number;
+        x.NO = this.driverList.find((d) => d.DRIVER === x.DRIVER)?.NO as number;
     });
 
     this.f1DriversChampionship = drivers;
   }
+
+
 
   removeNonActiveDrivers(drivers: Formula1Driver[]) {
     let posCorrection: number = 0;
@@ -257,10 +351,21 @@ export class AppComponent {
   ////////////////////////////////////////////////////////////
 
   // Opening Page -> PostRace Step 1 (Constructors Champ)
+  // check to see if theres previous race set up. if so use that data to setup the grid
   onPostRaceWeekend() {
     this.isOpeningPage = false;
-    this.setUpDriversListDropDown();
     this.isPostRaceWeekend = true;
+
+    this.dataService.getConstructorBeforeWeekend().subscribe(data => {
+      this.constructorTeams = data;
+      // if (this.f1DriversChampionship != null && this.f1DriversChampionship.length > 0) {
+      if (this.constructorTeams && this.constructorTeams.length && this.constructorTeams[0].Drivers.length) {
+        this.setDriversChampOrderByConstructor();
+      } else {
+        this.setUpDriversListDropDown();
+      }
+      console.log(data)
+    });
   }
 
   // PostRace Step 1 (Constructors Champ) -> Opening Page
@@ -334,35 +439,65 @@ export class AppComponent {
 
   // Parse Race Results
   // method written by Chat GPT
+  // this method was retired 9/1 due to formatting changes
+  // parseF1Results(resultsString: string): F1Result[] {
+  //   const rows = resultsString.trim().split('\n');
+  //   const header = rows[0].split('\t');
+  //   const f1Results: F1Result[] = [];
+
+  //   for (let i = 1; i < rows.length; i++) {
+  //     const columns = rows[i].split('\t');
+  //     const f1Result: F1Result = {} as F1Result;
+
+  //     for (let j = 0; j < header.length; j++) {
+  //       const columnName = header[j];
+  //       const columnValue = columns[j];
+
+  //       if (
+  //         columnName === 'NO' ||
+  //         columnName === 'LAPS' ||
+  //         columnName === 'PTS'
+  //       ) {
+  //         f1Result[columnName] = parseInt(columnValue, 10);
+  //       } else {
+  //         f1Result[columnName] = columnValue;
+  //       }
+  //     }
+
+  //     f1Results.push(f1Result);
+  //   }
+
+  //   return f1Results;
+  // }
+
+  // Parse Race Results
+  // method written by Chat GPT
   parseF1Results(resultsString: string): F1Result[] {
-    const rows = resultsString.trim().split('\n');
-    const header = rows[0].split('\t');
+    const rows = resultsString.trim().split('\n\n');
+    const header = rows.slice(0, 7).map(h => h.trim());
     const f1Results: F1Result[] = [];
 
-    for (let i = 1; i < rows.length; i++) {
-      const columns = rows[i].split('\t');
-      const f1Result: F1Result = {} as F1Result;
+    for (let i = 7; i < rows.length; i += 6) {
+        const f1Result: F1Result = {} as F1Result;
 
-      for (let j = 0; j < header.length; j++) {
-        const columnName = header[j];
-        const columnValue = columns[j];
+        f1Result['POS'] = rows[i].trim();
+        f1Result['NO'] = parseInt(rows[i + 1].trim(), 10);
+        const [driver, car] = rows[i + 2].split('\t\n');
+        f1Result['DRIVER'] = driver.trim();
+        f1Result['CAR'] = car.trim();
+        f1Result['LAPS'] = parseInt(rows[i + 3].trim(), 10);
+        f1Result['TIME/RETIRED'] = rows[i + 4].trim();
+        f1Result['PTS'] = parseInt(rows[i + 5].trim(), 10);
 
-        if (
-          columnName === 'NO' ||
-          columnName === 'LAPS' ||
-          columnName === 'PTS'
-        ) {
-          f1Result[columnName] = parseInt(columnValue, 10);
-        } else {
-          f1Result[columnName] = columnValue;
-        }
-      }
-
-      f1Results.push(f1Result);
+        f1Results.push(f1Result);
     }
 
     return f1Results;
   }
+
+
+
+
 
   onCalculateConstructors() {
     this.raceResults = this.parseF1Results(this.raceResultsInput);
@@ -399,7 +534,13 @@ export class AppComponent {
 
     switch (driverResult.POS) {
       case '1':
-        subtractVal = 15;
+        // NO MORE MAX DOMINANCE
+        // if (driverResult.CAR === 'RED BULL RACING HONDA RBPT') {
+           subtractVal = 15;
+        // } 
+        // else { // get 3 extra points if non rb wins
+        //  subtractVal = 12;
+        // }
         break;
       case '2':
         subtractVal = 9;
@@ -475,29 +616,7 @@ export class AppComponent {
   // ];
 
   // // Test the function with the provided results string
-  raceResultsStr: string = `
-  POS	NO	DRIVER	CAR	LAPS	TIME/RETIRED	PTS
-  1	1	Max Verstappen	RED BULL RACING HONDA RBPT	70	1:38:08.634	26
-  2	4	Lando Norris	MCLAREN MERCEDES	70	+33.731s	18
-  3	11	Sergio Perez	RED BULL RACING HONDA RBPT	70	+37.603s	15
-  4	44	Lewis Hamilton	MERCEDES	70	+39.134s	12
-  5	81	Oscar Piastri	MCLAREN MERCEDES	70	+62.572s	10
-  6	63	George Russell	MERCEDES	70	+65.825s	8
-  7	16	Charles Leclerc	FERRARI	70	+70.317s	6
-  8	55	Carlos Sainz	FERRARI	70	+71.073s	4
-  9	14	Fernando Alonso	ASTON MARTIN ARAMCO MERCEDES	70	+75.709s	2
-  10	18	Lance Stroll	ASTON MARTIN ARAMCO MERCEDES	69	+1 lap	1
-  11	23	Alexander Albon	WILLIAMS MERCEDES	69	+1 lap	0
-  12	77	Valtteri Bottas	ALFA ROMEO FERRARI	69	+1 lap	0
-  13	3	Daniel Ricciardo	ALPHATAURI HONDA RBPT	69	+1 lap	0
-  14	27	Nico Hulkenberg	HAAS FERRARI	69	+1 lap	0
-  15	22	Yuki Tsunoda	ALPHATAURI HONDA RBPT	69	+1 lap	0
-  16	24	Zhou Guanyu	ALFA ROMEO FERRARI	69	+1 lap	0
-  17	20	Kevin Magnussen	HAAS FERRARI	69	+1 lap	0
-  18	2	Logan Sargeant	WILLIAMS MERCEDES	67	DNF	0
-  NC	31	Esteban Ocon	ALPINE RENAULT	2	DNF	0
-  NC	10	Pierre Gasly	ALPINE RENAULT	1	DNF	0
-  `;
+  raceResultsStr: string = `POS\n\nDRIVER\n\nNATIONALITY\n\nCAR\n\nPTS\n\n1\n\nMax Verstappen\n\nNED\n\nRed Bull Racing Honda RBPT\n\n295\n\n2\n\nLando Norris\n\nGBR\n\nMcLaren Mercedes\n\n225\n\n3\n\nCharles Leclerc\n\nMON\n\nFerrari\n\n192\n\n4\n\nOscar Piastri\n\nAUS\n\nMcLaren Mercedes\n\n179\n\n5\n\nCarlos Sainz\n\nESP\n\nFerrari\n\n172\n\n6\n\nLewis Hamilton\n\nGBR\n\nMercedes\n\n154\n\n7\n\nSergio Perez\n\nMEX\n\nRed Bull Racing Honda RBPT\n\n139\n\n8\n\nGeorge Russell\n\nGBR\n\nMercedes\n\n122\n\n9\n\nFernando Alonso\n\nESP\n\nAston Martin Aramco Mercedes\n\n50\n\n10\n\nLance Stroll\n\nCAN\n\nAston Martin Aramco Mercedes\n\n24\n\n11\n\nNico Hulkenberg\n\nGER\n\nHaas Ferrari\n\n22\n\n12\n\nYuki Tsunoda\n\nJPN\n\nRB Honda RBPT\n\n22\n\n13\n\nDaniel Ricciardo\n\nAUS\n\nRB Honda RBPT\n\n12\n\n14\n\nPierre Gasly\n\nFRA\n\nAlpine Renault\n\n8\n\n15\n\nOliver Bearman\n\nGBR\n\nFerrari\n\n6\n\n16\n\nKevin Magnussen\n\nDEN\n\nHaas Ferrari\n\n5\n\n17\n\nEsteban Ocon\n\nFRA\n\nAlpine Renault\n\n5\n\n18\n\nAlexander Albon\n\nTHA\n\nWilliams Mercedes\n\n4\n\n19\n\nZhou Guanyu\n\nCHN\n\nKick Sauber Ferrari\n\n0\n\n20\n\nLogan Sargeant\n\nUSA\n\nWilliams Mercedes\n\n0\n\n21\n\nValtteri Bottas\n\nFIN\n\nKick Sauber Ferrari\n\n0`;
 
 //   setDriversChampJson() {
 //     this.driversChampJson = `

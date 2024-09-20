@@ -6,6 +6,6 @@ export class DriverLite {
 
   public constructor(driver: Formula1Driver) {
     this.NO = driver.NO;
-    this.DRIVER = driver.driver;
+    this.DRIVER = driver.DRIVER;
   }
 }

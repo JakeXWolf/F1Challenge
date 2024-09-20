@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 
+import { HttpClientModule } from '@angular/common/http'; // Import HttpClientModule
+
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DropdownModule } from 'primeng/dropdown';
@@ -16,6 +18,8 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
     AppComponent
   ],
   imports: [
+    HttpClientModule,
+
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,

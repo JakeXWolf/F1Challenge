@@ -29,12 +29,11 @@
   </h4>
 
   <div class="gridContainer">
-    <p-table
+    <!-- <p-table
       [value]="f1DriversChampionship"
       styleClass="p-datatable-gridlines"
       [tableStyle]="{ 'min-width': '30rem' }"
     >
-    <!-- <p-table [value]="f1DriversChampionship"> -->
       <ng-template pTemplate="header">
         <tr>
           <th style="width: 4rem;">Place</th>
@@ -53,8 +52,42 @@
           <p-button label="Set Drivers Champ" styleClass="p-button-raised p-button-text" (click)="onSetDriversChampJson()"></p-button>
         </div>
       </ng-template>
+    </p-table> -->
+
+    
+    <h5>Drag to order the drivers</h5>
+    <p-table [value]="f1DriversChampionship" 
+            [columns]="cols" 
+            [reorderableColumns]="true" 
+            (onRowReorder)="onDriversRowReorderAlgorithm($event)"
+            [tableStyle]="{ 'min-width': '30rem' }">
+      <ng-template pTemplate="header" let-columns>
+          <tr>
+              <th style="width:3rem"></th>
+              <th pReorderableColumn>Place</th>
+              <th pReorderableColumn>
+                Name
+              </th>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-rowData let-columns="columns" let-index="rowIndex">
+          <tr [pReorderableRow]="index">
+              <td>
+                  <span class="pi pi-bars" pReorderableRowHandle></span>
+              </td>
+              <td> {{index + 1}} </td>
+              <td> {{rowData.DRIVER}} </td>
+          </tr>
+      </ng-template>
+      <ng-template pTemplate="summary">
+        <div class="flex align-items-center justify-content-between" style="display: inline-grid;">
+          <textarea rows="5" cols="30" pInputTextarea [(ngModel)]="driversChampJson"></textarea>
+          <p-button label="Set Drivers Champ" styleClass="p-button-raised p-button-text" (click)="onSetDriversChampJson()"></p-button>
+        </div>
+      </ng-template>
     </p-table>
   </div>
+  
   <div class="directonButtonsCtn">
     <p-button styleClass="p-button-raised p-button-danger" (click)="onDriversChampGoBack();">
       <span class="p-button-label">
