@@ -240,7 +240,8 @@ export class AppComponent {
 
   removeNonActiveDrivers(drivers: Formula1Driver[]) {
     let posCorrection: number = 0;
-    let nonActiveDrivers: string[] = ['Oliver Bearman'];
+    let nonActiveDrivers: string[] = ['Oliver Bearman', 'Logan Sargeant', 'Daniel Ricciardo'];
+    // let nonActiveDrivers: string[] = ['Logan Sargeant', 'Daniel Ricciardo', 'Kevin Magnussen'];
 
     for (let i: number = 0; i < drivers.length; i++) {
       if (nonActiveDrivers.includes(drivers[i].DRIVER)) {
